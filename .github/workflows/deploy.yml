@@ -1,0 +1,85 @@
+name: "Build Binary for MacOS, Linux, and Windows"
+
+on:
+    push:
+      branches: [ "main" ]  
+
+concurrency:
+    group: environment-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    id-token: write
+    contents: write
+
+jobs:
+    get-version:
+        name: "Get Maroon Version"
+        runs-on: "ubuntu-latest"
+
+        defaults:
+            run:
+                shell: bash
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Go
+              uses: actions/setup-go@v4
+              with:
+                go-version: '1.20.4'
+
+            - name: Build Maroon CLI
+              run: go build -o maroon
+
+            - name: Get Maroon Version
+              run: echo "HAZE_VERSION=$(./maroon --version)" > maroon-version.txt
+
+            - name: Upload Maroon Version Information
+              uses: actions/upload-artifact@v1
+              with:
+                name: maroon-version
+                path: maroon-version.txt
+
+    build:
+        needs: [get-version]
+        name: "Build Maroon Binaries"
+        runs-on: "ubuntu-latest"
+
+        defaults:
+            run:
+                shell: bash
+
+        strategy:
+            matrix:
+                os: [darwin, linux, windows]
+                arch: [arm64, amd64]
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Go
+              uses: actions/setup-go@v4
+              with:
+                go-version: '1.20.4'
+
+            - name: Build Maroon CLI
+              run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o maroon-${{ matrix.os }}-${{ matrix.arch }}
+
+            - name: Download Maroon Version Information
+              uses: actions/download-artifact@v1
+              with:
+                name: maroon-version
+            
+            - name: Get Maroon Version Information
+              id: get-maroon-version
+              run: cat maroon-version/maroon-version.txt >> "$GITHUB_OUTPUT"
+
+            - name: Publish Binary to Releases
+              uses: svenstaro/upload-release-action@v2
+              with:
+                file: maroon-${{ matrix.os }}-${{ matrix.arch }}
+                asset_name: maroon-${{ matrix.os }}-${{ matrix.arch }}
+                tag: ${{ steps.get-maroon-version.outputs.HAZE_VERSION }}
