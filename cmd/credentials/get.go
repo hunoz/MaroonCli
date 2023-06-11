@@ -60,13 +60,13 @@ func getCredentials(token string, apiInput v1.AssumeRoleInput) (*v1.AssumeRoleOu
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error getting console url")
+		return nil, errors.Wrap(err, "Error assuming role")
 	}
 
 	if resp.StatusCode == 401 {
 		return nil, errors.New("Invalid/expired token")
 	} else if resp.StatusCode != 200 {
-		return nil, errors.New("Unable to generate console url")
+		return nil, errors.New("Unable to assume role")
 	}
 
 	defer resp.Body.Close()
