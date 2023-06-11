@@ -29,7 +29,7 @@ func FetchCredentials(accountId string, roleName string, duration int32) (*types
 		configuration = config
 	}
 
-	creds, err := getCredentials(configuration.IdToken, v1.AssumeRoleInput{
+	apiResponse, err := getCredentials(configuration.IdToken, v1.AssumeRoleInput{
 		RoleArn:         fmt.Sprintf("arn:aws:iam::%s:role/%s", accountId, roleName),
 		SessionDuration: duration,
 	})
@@ -38,15 +38,15 @@ func FetchCredentials(accountId string, roleName string, duration int32) (*types
 		return nil, errors.Wrap(err, "Error fetching credentials")
 	}
 	return &types.Credentials{
-		AccessKeyId:     &creds.AccessKeyId,
-		SecretAccessKey: &creds.SecretAccessKey,
-		SessionToken:    &creds.SessionToken,
-		Expiration:      &creds.Expiration,
+		AccessKeyId:     &apiResponse.Data.AccessKeyId,
+		SecretAccessKey: &apiResponse.Data.SecretAccessKey,
+		SessionToken:    &apiResponse.Data.SessionToken,
+		Expiration:      &apiResponse.Data.Expiration,
 	}, nil
 }
 
-func getCredentials(token string, apiInput v1.AssumeRoleInput) (*v1.AssumeRoleOutput, error) {
-	var output v1.AssumeRoleOutput
+func getCredentials(token string, apiInput v1.AssumeRoleInput) (*v1.JSONResponse[v1.AssumeRoleOutput], error) {
+	var output v1.JSONResponse[v1.AssumeRoleOutput]
 
 	req, _ := http.NewRequest(
 		"GET",

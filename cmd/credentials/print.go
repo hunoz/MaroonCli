@@ -57,10 +57,10 @@ func GetActiveCredentials(profileName string) types.Credentials {
 		}
 
 		credentials = types.Credentials{
-			AccessKeyId:     &output.AccessKeyId,
-			SecretAccessKey: &output.SecretAccessKey,
-			SessionToken:    &output.SessionToken,
-			Expiration:      &output.Expiration,
+			AccessKeyId:     &output.Data.AccessKeyId,
+			SecretAccessKey: &output.Data.SecretAccessKey,
+			SessionToken:    &output.Data.SessionToken,
+			Expiration:      &output.Data.Expiration,
 		}
 		credentialsInFileError = true
 		// If the credentials expire in less than 15 minutes, refresh
@@ -75,10 +75,10 @@ func GetActiveCredentials(profileName string) types.Credentials {
 		}
 
 		credentials = types.Credentials{
-			AccessKeyId:     &output.AccessKeyId,
-			SecretAccessKey: &output.SecretAccessKey,
-			SessionToken:    &output.SessionToken,
-			Expiration:      &output.Expiration,
+			AccessKeyId:     &output.Data.AccessKeyId,
+			SecretAccessKey: &output.Data.SecretAccessKey,
+			SessionToken:    &output.Data.SessionToken,
+			Expiration:      &output.Data.Expiration,
 		}
 		credentialsInFileError = true
 	} else {
