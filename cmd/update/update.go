@@ -14,7 +14,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var CmdVersion = "v1.0.2"
+var CmdVersion = "v1.0.3"
 
 type Release struct {
 	Url       string `json:"url,omitempty"`
