@@ -47,7 +47,6 @@ func GetActiveCredentials(profileName string) types.Credentials {
 	now := time.Now().UTC()
 	// If credentials are empty, re-fetch them
 	if profile.Credentials == (types.Credentials{}) {
-		color.Cyan("No credentials found in config, obtaining")
 		output, err := getCredentials(sparkConfiguration.IdToken, v1.AssumeRoleInput{
 			RoleArn:         fmt.Sprintf("arn:aws:iam::%s:role/%s", profile.AccountId, profile.RoleToAssume),
 			SessionDuration: 3600,
@@ -66,7 +65,6 @@ func GetActiveCredentials(profileName string) types.Credentials {
 		credentialsInFileError = true
 		// If the credentials expire in less than 15 minutes, refresh
 	} else if profile.Credentials.Expiration.Sub(now).Seconds() <= 900 {
-		color.Cyan("Credentials are expired, refreshing")
 		output, err := getCredentials(sparkConfiguration.IdToken, v1.AssumeRoleInput{
 			RoleArn:         fmt.Sprintf("arn:aws:iam::%s:role/%s", profile.AccountId, profile.RoleToAssume),
 			SessionDuration: 3600,
